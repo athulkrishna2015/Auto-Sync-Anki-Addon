@@ -29,7 +29,7 @@ Configuration is stored in Anki's collection config under the key `auto_sync_con
 | `idle sync timeout` | int (minutes) | 0 | Periodic sync interval while idle (0 = Off) |
 | `strictly avoid interruptions` | bool | true | Skip sync during reviews/dialogs/focus |
 | `sync on change only` | bool | true | Only sync when `col.mod` has changed |
-| `idle before sync` | int (minutes) | 10 | Idle wait after change before syncing |
+| `idle before sync` | int (minutes) | 2 | Idle wait after change before syncing |
 | `config version` | int | 4 | Config schema version |
 
 ## Background Sync Architecture

@@ -38,7 +38,7 @@ class AutoSyncConfigManager:
         if current_config.get(CONFIG_CONFIG_VERSION, 0) < 4:
             current_config[CONFIG_IDLE_SYNC_TIMEOUT] = 0
             current_config[CONFIG_SYNC_ON_CHANGE_ONLY] = True
-            current_config[CONFIG_IDLE_BEFORE_SYNC] = 10
+            current_config[CONFIG_IDLE_BEFORE_SYNC] = 2
             current_config[CONFIG_CONFIG_VERSION] = 4
 
         # Merge default config into current config for any missing keys (migrations)
