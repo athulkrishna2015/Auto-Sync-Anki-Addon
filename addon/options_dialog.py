@@ -68,6 +68,7 @@ class AutoSyncOptionsDialog(QDialog):
         # Enable/disable the relevant spinboxes based on this
         self.idle_before_sync_spinbox.setEnabled(bool(enabled))
         self.sync_timeout_spinbox.setEnabled(not bool(enabled))
+        self.idle_sync_timeout_spinbox.setEnabled(not bool(enabled))
 
     def change_idle_before_sync(self, value):
         self._set_minutes_suffix(self.idle_before_sync_spinbox, value)
@@ -104,6 +105,7 @@ class AutoSyncOptionsDialog(QDialog):
         self._set_minutes_suffix(self.idle_sync_timeout_spinbox, self.idle_sync_timeout_spinbox.value())
         self.idle_sync_timeout_spinbox.setToolTip('While you are not using Anki, the program will keep syncing in the background (in case you are using Anki on mobile or web and there are changes to sync)')
         self.idle_sync_timeout_spinbox.valueChanged.connect(self.change_idle_sync_timeout)
+        self.idle_sync_timeout_spinbox.setEnabled(not self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
 
         # "Strictly avoid interruptions" checkbox
 
@@ -238,6 +240,7 @@ class AutoSyncOptionsDialog(QDialog):
 
         self.idle_before_sync_spinbox.setEnabled(self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
         self.sync_timeout_spinbox.setEnabled(not self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
+        self.idle_sync_timeout_spinbox.setEnabled(not self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
 
         self.sync_timeout_spinbox.blockSignals(False)
         self.idle_sync_timeout_spinbox.blockSignals(False)
