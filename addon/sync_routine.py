@@ -249,12 +249,51 @@ class SyncRoutine:
 
         # Save window state BEFORE sync to restore afterwards
         self._save_window_state()
-        self.log(f"Syncing (background: minimized={self._pre_sync_was_minimized}, "
-                 f"hidden={self._pre_sync_was_hidden}, "
-                 f"anki_active={self._pre_sync_active_window == mw})")
+        self.log(f"Syncing (background: minimized={self._pre_sync_was_minimized}, hidden={self._pre_sync_was_hidden}, anki_active={self._pre_sync_active_window == mw})")
 
         self.sync_in_progress = True
-        mw.onSync()
+
+        from aqt import gui_hooks
+        auth = mw.pm.sync_auth()
+        if not auth:
+            self.log("Not logged in to AnkiWeb, skipping sync")
+            self.sync_finished()
+            return
+
+        def on_future_done(fut):
+            mw.col._load_scheduler()
+            try:
+                out = fut.result()
+            except Exception as err:
+                self.log(f"Sync error: {err}")
+                from aqt.sync import handle_sync_error
+                handle_sync_error(mw, err)
+                gui_hooks.sync_did_finish()
+                return
+
+            mw.pm.set_host_number(out.host_number)
+            if out.new_endpoint:
+                mw.pm.set_current_sync_url(out.new_endpoint)
+            
+            if out.server_message:
+                from aqt.utils import showText
+                showText(out.server_message, parent=mw)
+
+            if out.required == out.NO_CHANGES:
+                mw.media_syncer.start_monitoring()
+                # Properly notify all addons (including ourselves) that sync is complete
+                gui_hooks.sync_did_finish()
+            else:
+                self.log("Full sync required (conflict). Passing to Anki UI.")
+                from aqt.sync import full_sync
+                full_sync(mw, out, gui_hooks.sync_did_finish)
+
+        gui_hooks.sync_will_start()
+        # Headless sync exactly like native, but using run_in_background instead of with_progress!
+        mw.taskman.run_in_background(
+            lambda: mw.col.sync_collection(auth, mw.pm.media_syncing_enabled()),
+            on_future_done
+        )
 
     def sync_finished(self, *args):
         """When one sync cycle has finished, start the whole process over.
