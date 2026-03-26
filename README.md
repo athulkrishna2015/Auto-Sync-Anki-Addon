@@ -22,7 +22,7 @@ This addon is a fork of [Auto-Sync-Anki-Addon by Robin-Haupt-1](https://github.c
 2. In Anki, go to **Tools → Add-ons → Install from file…** and select the downloaded file.
 3. Restart Anki.
 
-Or install via AnkiWeb addon code (if published).
+Or install via AnkiWeb addon code (226796325).
 
 ## Configuration
 
