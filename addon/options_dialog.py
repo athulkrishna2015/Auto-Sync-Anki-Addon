@@ -64,8 +64,9 @@ class AutoSyncOptionsDialog(QDialog):
     def change_sync_on_change_only(self, enabled):
         self.config.set(CONFIG_SYNC_ON_CHANGE_ONLY, bool(enabled))
         self.sync_routine.reload_config()
-        # Enable/disable the idle-before-sync spinbox based on this
+        # Enable/disable the relevant spinboxes based on this
         self.idle_before_sync_spinbox.setEnabled(bool(enabled))
+        self.sync_timeout_spinbox.setEnabled(not bool(enabled))
 
     def change_idle_before_sync(self, value):
         self._set_minutes_suffix(self.idle_before_sync_spinbox, value)
@@ -89,6 +90,7 @@ class AutoSyncOptionsDialog(QDialog):
         self._set_minutes_suffix(self.sync_timeout_spinbox, self.sync_timeout_spinbox.value())
         self.sync_timeout_spinbox.setToolTip('How many minutes after you have last interacted with Anki the program will wait to start the sync')
         self.sync_timeout_spinbox.valueChanged.connect(self.change_sync_timeout)
+        self.sync_timeout_spinbox.setEnabled(not self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
 
         # "Idle Sync after" option
 
