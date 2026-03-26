@@ -37,6 +37,7 @@ class AutoSyncOptionsDialog(QDialog):
         self.idle_sync_timeout_spinbox = QSpinBox()
         self.sync_on_change_only_checkbox = QCheckBox()
         self.idle_before_sync_spinbox = QSpinBox()
+        self.strictly_avoid_interruptions_checkbox = QCheckBox()
 
         self.setup_ui()
 
@@ -108,11 +109,10 @@ class AutoSyncOptionsDialog(QDialog):
 
         strictly_avoid_interruptions_label = QLabel("Strictly avoid interruptions (recommended)")
         strictly_avoid_interruptions_label.setToolTip("Will not auto sync if cards are being reviewed, the card browser or similar windows are open <br>or the main window has focus (isn't minimized or in the background)")
-        strictly_avoid_interruptions_checkbox = QCheckBox()
-        strictly_avoid_interruptions_checkbox.setToolTip("Will not auto sync if cards are being reviewed, the card browser or similar windows are open <br>or the main window has focus (isn't minimized or in the background)")
-        strictly_avoid_interruptions_checkbox.setChecked(self.config.get(CONFIG_STRICTLY_AVOID_INTERRUPTIONS))
-        strictly_avoid_interruptions_checkbox.toggled.connect(self.change_strictly_avoid_interruption)
-        strictly_avoid_interruptions_label.mouseReleaseEvent = lambda *args: strictly_avoid_interruptions_checkbox.toggle()
+        self.strictly_avoid_interruptions_checkbox.setToolTip("Will not auto sync if cards are being reviewed, the card browser or similar windows are open <br>or the main window has focus (isn't minimized or in the background)")
+        self.strictly_avoid_interruptions_checkbox.setChecked(self.config.get(CONFIG_STRICTLY_AVOID_INTERRUPTIONS))
+        self.strictly_avoid_interruptions_checkbox.toggled.connect(self.change_strictly_avoid_interruption)
+        strictly_avoid_interruptions_label.mouseReleaseEvent = lambda *args: self.strictly_avoid_interruptions_checkbox.toggle()
 
         # "Only sync when changes detected" checkbox
 
@@ -155,6 +155,11 @@ class AutoSyncOptionsDialog(QDialog):
         open_log_button.clicked.connect(lambda *args: self.on_log_dialog_call())
         open_log_button.setMaximumWidth(100)
 
+        # Reset Defaults button
+        reset_button = QPushButton("Reset Defaults")
+        reset_button.clicked.connect(self.on_reset_to_defaults_call)
+        reset_button.setMaximumWidth(120)
+
         # Support button
         support_button = QPushButton()
         support_button.setText("Support")
@@ -178,7 +183,7 @@ class AutoSyncOptionsDialog(QDialog):
         grid.addWidget(self.idle_sync_timeout_spinbox, 1, 1)
 
         grid.addWidget(strictly_avoid_interruptions_label, 2, 0)
-        grid.addWidget(strictly_avoid_interruptions_checkbox, 2, 1)
+        grid.addWidget(self.strictly_avoid_interruptions_checkbox, 2, 1)
 
         grid.addWidget(sync_on_change_only_label, 3, 0)
         grid.addWidget(self.sync_on_change_only_checkbox, 3, 1)
@@ -190,6 +195,7 @@ class AutoSyncOptionsDialog(QDialog):
         
         btn_layout = QHBoxLayout()
         btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.addWidget(reset_button)
         btn_layout.addWidget(support_button)
         btn_layout.addWidget(close_button)
         grid.addLayout(btn_layout, 6, 1)
@@ -212,6 +218,34 @@ class AutoSyncOptionsDialog(QDialog):
     def on_support_dialog_call(self):
         dialog = SupportDialog(self)
         dialog.exec()
+
+    def on_reset_to_defaults_call(self):
+        from .constants import CONFIG_DEFAULT_CONFIG
+        for key, value in CONFIG_DEFAULT_CONFIG.items():
+            self.config.set(key, value)
+        
+        self.sync_timeout_spinbox.blockSignals(True)
+        self.idle_sync_timeout_spinbox.blockSignals(True)
+        self.strictly_avoid_interruptions_checkbox.blockSignals(True)
+        self.sync_on_change_only_checkbox.blockSignals(True)
+        self.idle_before_sync_spinbox.blockSignals(True)
+
+        self.sync_timeout_spinbox.setValue(self.config.get(CONFIG_SYNC_TIMEOUT))
+        self.idle_sync_timeout_spinbox.setValue(self.config.get(CONFIG_IDLE_SYNC_TIMEOUT))
+        self.strictly_avoid_interruptions_checkbox.setChecked(self.config.get(CONFIG_STRICTLY_AVOID_INTERRUPTIONS))
+        self.sync_on_change_only_checkbox.setChecked(self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
+        self.idle_before_sync_spinbox.setValue(self.config.get(CONFIG_IDLE_BEFORE_SYNC))
+
+        self.idle_before_sync_spinbox.setEnabled(self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
+        self.sync_timeout_spinbox.setEnabled(not self.config.get(CONFIG_SYNC_ON_CHANGE_ONLY))
+
+        self.sync_timeout_spinbox.blockSignals(False)
+        self.idle_sync_timeout_spinbox.blockSignals(False)
+        self.strictly_avoid_interruptions_checkbox.blockSignals(False)
+        self.sync_on_change_only_checkbox.blockSignals(False)
+        self.idle_before_sync_spinbox.blockSignals(False)
+
+        self.sync_routine.reload_config()
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         if self.log_dialog_instance:
