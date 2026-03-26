@@ -9,7 +9,7 @@ This addon is a fork of [Auto-Sync-Anki-Addon by Robin-Haupt-1](https://github.c
 - **True background sync** — If Anki is minimized, it stays minimized. If another app has focus, Anki won't steal it. The sync happens silently.
 - **Periodic sync** — Automatically syncs after a configurable period of inactivity (default: 1 minute after last interaction).
 - **Idle periodic sync** — While you're away, keeps syncing periodically (default: Off) to pick up changes from AnkiWeb, mobile, or other devices.
-- **Change detection** — Optionally only sync when the collection has actually been modified (cards added, reviewed, edited). Stops wasting bandwidth when nothing changed (enabled by default).
+- **Change detection** — Only syncs when the collection has actually been modified (cards added, reviewed, edited). Stops wasting bandwidth when nothing changed (enabled by default).
 - **Idle-before-sync delay** — When a change is detected, waits for a configurable idle period before syncing, so it doesn't interrupt an active editing session (default: 10 minutes).
 - **Strictly avoid interruptions** — Won't sync while you're reviewing cards, browsing, or have any Anki dialog open (enabled by default).
 - **Log window** — View a timestamped log of all sync activity for debugging.
