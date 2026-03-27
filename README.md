@@ -16,6 +16,12 @@ This addon is a fork of [Auto-Sync-Anki-Addon by Robin-Haupt-1](https://github.c
 - **Strictly avoid interruptions** — Won't sync while you're reviewing cards, browsing, or have any Anki dialog open (enabled by default).
 - **Log window** — View a timestamped log of all sync activity for debugging.
 
+## Important Considerations
+
+- **Undo Queue:** Syncing terminates Anki's "undo" queue. Periodic sync may mean that if you take a break and return, you won't be able to undo actions performed just before the break.
+- **Sync Conflicts:** Auto-syncing on one device while actively using, editing, or studying on another device can lead to sync conflicts. 
+- **Idle Periodic Sync:** Using "Idle periodic sync" while leaving Anki open may cause issues, especially if other add-ons with background activity are installed.
+
 ## Installation
 
 1. Download the latest `.ankiaddon` from [Releases](../../releases).
